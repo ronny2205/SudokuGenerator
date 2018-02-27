@@ -19,6 +19,33 @@ class Game
         @board.push(empty_row);
       end
     end
+    
+    @board_indicator = create_board_indicator
+    @number_of_initial_holes = @board_indicator.flatten.count(0)
+    @number_of_possible_solution_combinationas = 9 ** @number_of_initial_holes
+    @number_of_combinations_tried = 0
+  end
+  
+  # break or turn into while / throw-catch
+  def check_if_all_combos_tried(row, col, forward)
+    
+    if @board_indicator[row][col] == 0 && @board[row][col] == 9 && row == @row_of_first_empty_square && col == @col_of_first_empty_square
+      return true
+    else
+      return false
+    end
+    # if all initial holes are filled with'9', all combos were tried
+    # all_combos_tried = true
+    # (0..8).each do |k|
+    #   (0..8).each do |j|
+    #     if @board_indicator[k][j] == 0 && @board[k][j] < 9
+    #       all_combos_tried = false
+    #       #break
+    #     end
+    #   end
+    # end
+    # puts all_combos_tried
+    # all_combos_tried
   end
   
   def to_array
@@ -144,19 +171,39 @@ class Game
   # create a a board indicator
   # indicates for each square if it was originally empty or full => 1 for full, 0 for empty
   def create_board_indicator
+    @row_of_first_empty_square = 0
+    @col_of_first_empty_square = 0
+    first_empty_square_found = false
     board_indicator = initialize_empty_board
     (MIN_ROW_POSITION..MAX_ROW_POSITION).each do |j| 
       (MIN_COL_POSITION..MAX_COL_POSITION).each do |i|
-        board_indicator[j][i] = 1 if (@board[j][i] != 0 && @board[j][i] != '')
+        #board_indicator[j][i] = 1 if (@board[j][i] != 0 && @board[j][i] != '')
+        if (@board[j][i] == 0 || @board[j][i] == '')
+          if !first_empty_square_found
+            puts 'first empty'
+            first_empty_square_found = true
+            @row_of_first_empty_square = j
+            @col_of_first_empty_square = i
+          end
+        else
+          board_indicator[j][i] = 1
+        end
       end
     end
     board_indicator
   end
   
-  def solve_the_board
-    board_indicator = create_board_indicator
-    k = 0
-    j = 0
+  def solve_the_board(k = 0, j = 0)
+    
+    # check whether the given board was valid
+    if !self.valid_board?
+      puts "no solution"
+      return false
+    end
+    
+    # board_indicator = create_board_indicator
+    #k = 0
+    #j = 0
     forward = true
     while k < 9 && j < 9
       #puts 'row: ' + k.to_s
@@ -167,25 +214,29 @@ class Game
 
       found = false
       # If the square in the original board was empty
-      if board_indicator[k][j] == 0
+      if @board_indicator[k][j] == 0
         num = @board[k][j] + 1
+        #puts num
         while (!found && num <= 9)
+        #puts num
          @board[k][j] = num
          found = self.valid_board?
          num += 1
         end
         
-      
-        if found
-          forward = true
+        forward = found
+        
+        break if !forward && self.check_if_all_combos_tried(k, j, forward)
+        if found 
+          #forward = true
           if j < 8
             j += 1
           else
             j = 0
             k += 1
           end
-        else
-          forward = false
+        else #elsif @number_of_combinations_tried < 9 #----------- problem here / no need to ge back if all combos were tried
+          #forward = false
           @board[k][j] = 0  
           if j > 0
             j -= 1
@@ -214,8 +265,27 @@ class Game
       end
       
     end
-    @board
+    puts 'hello'
+    # Check whether a solution was found
+    if self.valid_board? && !@board.flatten.include?(0)
+      return @board
+    else
+      return false
+    end
     
+  end
+  
+  def check_whether_have_more_than_one_solution
+    #puts @board.inspect
+    second_solution = solve_the_board(8, 8) # (8, 8)
+    
+    puts second_solution.inspect
+    
+    if !second_solution
+      return false
+    else
+      return true
+    end
   end
   
   def generate_full_board
@@ -268,31 +338,37 @@ class Sudoku
   
 end
 
-b1 = Game.new
+#b1 = Game.new
 #puts b1.inspect
-b1.add_number(8,8,1)
+#b1.add_number(8,8,1)
 #puts b1.inspect
-puts b1.valid_board?
+#puts b1.valid_board?
 
-b2 = Game.new
- b2.generate_full_board
- puts b2.inspect
+ g2 = Game.new
+  g2.solve_the_board
+ puts "done"
+ #puts g5.inspect
+ puts g2.board.inspect
+ g2.check_whether_have_more_than_one_solution
+# g2.generate_full_board
+# puts g2.board.inspect
+# puts g2.check_whether_have_more_than_one_solution
 
 #b3 = Game.new
 
-b3 = Game.new([[0, 0, 0, 0, 7, 0, 9, 0, 5], 
-                [0, 3, 0, 0, 4, 0, 0, 0, 0], 
-                [5, 0, 0, 3, 0, 0, 0, 2, 1], 
-                [0, 0, 5, 0, 0, 2, 0, 0, 4], 
-                [1, 0, 0, 0, 0, 0, 0, 0, 9], 
-                [6, 0, 0, 7, 0, 0, 1, 0, 0], 
-                [9, 6, 0, 0, 0, 5, 0, 0, 2], 
-                [0, 0, 0, 0, 9, 0, 0, 1, 0], 
-                [7, 0, 8, 0, 2, 0, 0, 0, 0]])
-b3.solve_the_board
-puts b3.inspect
+# b3 = Game.new([[0, 0, 0, 0, 7, 0, 9, 0, 5], 
+#                 [0, 3, 0, 0, 4, 0, 0, 0, 0], 
+#                 [5, 0, 0, 3, 0, 0, 0, 2, 1], 
+#                 [0, 0, 5, 0, 0, 2, 0, 0, 4], 
+#                 [1, 0, 0, 0, 0, 0, 0, 0, 9], 
+#                 [6, 0, 0, 7, 0, 0, 1, 0, 0], 
+#                 [9, 6, 0, 0, 0, 5, 0, 0, 2], 
+#                 [0, 0, 0, 0, 9, 0, 0, 1, 0], 
+#                 [7, 0, 8, 0, 2, 0, 0, 0, 0]])
+# b3.solve_the_board
+# puts b3.inspect
 
-
+g5 = Game.new(
 
 [[8, 4, 6, 2, 7, 1, 9, 3, 5], 
  [2, 3, 1, 5, 4, 9, 8, 6, 7], 
@@ -304,4 +380,32 @@ puts b3.inspect
  
  [9, 6, 3, 1, 8, 5, 7, 4, 2], 
  [4, 5, 2, 6, 9, 7, 3, 1, 8], 
- [7, 1, 8, 4, 2, 3, 5, 9, 6]]
+ [7, 1, 8, 4, 2, 3, 5, 0, 0]]
+ )
+ g5.solve_the_board
+ puts "done"
+ #puts g5.inspect
+ puts g5.board.inspect
+ g5.check_whether_have_more_than_one_solution
+ 
+ 
+ [[1, 2, 3, 4, 5, 6, 7, 8, 9], 
+  [4, 5, 6, 7, 8, 9, 1, 2, 3], 
+  [7, 8, 9, 1, 2, 3, 4, 5, 6], 
+  [2, 1, 4, 3, 6, 5, 8, 9, 7], 
+  [3, 6, 5, 8, 9, 7, 2, 1, 4], 
+  [8, 9, 7, 2, 1, 4, 3, 6, 5], 
+  [5, 3, 1, 6, 4, 2, 9, 7, 8], 
+  [6, 4, 2, 9, 7, 8, 5, 3, 1], 
+  [9, 7, 8, 5, 3, 1, 6, 4, 2]]
+  
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], 
+ [4, 5, 6, 7, 8, 9, 1, 2, 3], 
+ [7, 8, 9, 1, 2, 3, 4, 5, 6], 
+ [2, 1, 4, 3, 6, 5, 8, 9, 7], 
+ [3, 6, 5, 8, 9, 7, 2, 1, 4], 
+ [8, 9, 7, 2, 1, 4, 3, 6, 5], 
+ [5, 3, 1, 6, 4, 2, 9, 7, 8], 
+ [6, 7, 8, 9, 3, 1, 5, 4, 2], 
+ [9, 4, 2, 5, 7, 8, 6, 3, 1]]
+ 
