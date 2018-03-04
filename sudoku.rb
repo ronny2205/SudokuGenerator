@@ -7,6 +7,9 @@ class Game
   MIN_COL_POSITION = 0
   MAX_COL_POSITION = 8
   
+  LOWEST_DIGIT = 1
+  HIGHEST_DIGIT = 9
+  
   def initialize (board = [])
     # initialize an empty board
     @board = board
@@ -59,10 +62,6 @@ class Game
   def add_number(row, col, num)
     @board[row][col] = num
   end
-  
-    def kuku
-        return 'Kuku'
-    end
     
   # Checks whether an array is unique.
   # Array is unique if no number / character repeats more than once. Empty cell can appear more than once.

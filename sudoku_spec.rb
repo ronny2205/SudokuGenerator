@@ -1,4 +1,5 @@
 require "sudoku"
+
 require "json"
 
 RSpec::Matchers.define :be_a_multiple_of do |expected|
@@ -21,11 +22,9 @@ end
 #   end
 # end
 
+
+
 describe Game do
-  it "says kuku" do
-    @b = Game.new
-    expect(@b.kuku).to eq "Kuku"
-  end
   
   # Array is unique if no number / character repeats more than once. Empty cell can appear more than once.
   # Empty character ('') & 0 are considered empty. 
@@ -246,6 +245,23 @@ describe Game do
                 [6, 4, 2, 9, 7, 8, 5, 3, 1], 
                 [9, 7, 8, 5, 3, 1, 6, 4, 2]]
     expect(actual).to eq expected
+  end
+  
+  it "finds no solution" do 
+    g5 = Game.new(
+      [[8, 4, 6, 2, 7, 1, 9, 3, 5], 
+       [2, 3, 1, 5, 4, 9, 8, 6, 7], 
+       [5, 9, 7, 3, 6, 8, 4, 2, 1], 
+       [3, 8, 5, 9, 1, 2, 6, 7, 4], 
+       [1, 7, 4, 8, 3, 6, 2, 5, 9], 
+       [6, 2, 9, 7, 5, 4, 1, 8, 3], 
+       [9, 6, 3, 1, 8, 5, 7, 4, 2], 
+       [4, 5, 2, 6, 9, 7, 3, 1, 8], 
+       [7, 1, 8, 4, 2, 3, 5, 5, 0]]
+    )
+    actual = g5.solve_the_board
+    expect(actual).to be false
+  
   end
   
 end
