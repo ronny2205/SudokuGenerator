@@ -8,7 +8,7 @@ class SudokuGenerator
     # Solving an empty board will generate a full valid soduku board
     @s.solve_the_board
     
-    puts @s.board.inspect
+    @s.print_board
   end
     
 end

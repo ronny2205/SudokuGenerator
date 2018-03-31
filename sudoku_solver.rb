@@ -38,6 +38,17 @@ class SudokuSolver
     board
   end
   
+  def print_board
+    (MIN_ROW_POSITION..MAX_ROW_POSITION).each do |j| 
+      (MIN_COL_POSITION..MAX_COL_POSITION).each do |i|
+        current_num = @board[j][i] == 0 ? ' ' : @board[j][i]
+        print current_num
+        print ' '
+      end
+      puts
+    end
+  end
+  
   # create a a board indicator
   # indicates for each square if it was originally empty or full => 1 for full, 0 for empty
   def create_board_indicator
