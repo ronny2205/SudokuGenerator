@@ -349,9 +349,9 @@ end
  #puts g5.inspect
  puts g2.board.inspect
  g2.check_whether_have_more_than_one_solution
-# g2.generate_full_board
-# puts g2.board.inspect
-# puts g2.check_whether_have_more_than_one_solution
+ g2.generate_full_board
+puts g2.board.inspect
+puts g2.check_whether_have_more_than_one_solution
 
 #b3 = Game.new
 
@@ -381,11 +381,11 @@ g5 = Game.new(
  [4, 5, 2, 6, 9, 7, 3, 1, 8], 
  [7, 1, 8, 4, 2, 3, 5, 0, 0]]
  )
- g5.solve_the_board
- puts "done"
- #puts g5.inspect
- puts g5.board.inspect
- g5.check_whether_have_more_than_one_solution
+# g5.solve_the_board
+# puts "done"
+
+# puts g5.board.inspect
+# g5.check_whether_have_more_than_one_solution
  
  
  [[1, 2, 3, 4, 5, 6, 7, 8, 9], 
